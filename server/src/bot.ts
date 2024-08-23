@@ -8,8 +8,8 @@ import { GameConfig } from "../../shared/gameConfig";
 import * as net from "../../shared/net/net";
 import { util } from "../../shared/utils/util";
 import { v2 } from "../../shared/utils/v2";
-import { ObjectCreator } from "./stressTest";
 import type { FindGameResponse } from "./gameServer";
+import { ObjectCreator } from "./stressTest";
 
 //
 // Cache random loadout types
@@ -20,7 +20,6 @@ for (const outfit in OutfitDefs) {
     if (!UnlockDefs.unlock_default.unlocks.includes(outfit)) continue;
     outfits.push(outfit);
 }
-
 
 const emotes: string[] = [];
 for (const emote in EmotesDefs) {

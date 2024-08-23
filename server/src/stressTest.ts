@@ -1,10 +1,10 @@
-import { Bot } from "./bot";
-import * as net from "../../shared/net/net";
+import type * as net from "../../shared/net/net";
 import {
     type ObjectData,
     ObjectType,
     type ObjectsPartialData,
 } from "../../shared/net/objectSerializeFns";
+import { Bot } from "./bot";
 
 const config = {
     address: "http://127.0.0.1:8001",
