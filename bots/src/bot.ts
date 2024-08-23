@@ -1,6 +1,5 @@
 import assert from "assert";
 import WebSocket from "ws";
-import { PlayerBarn } from "../../client/src/objects/player";
 import type { FindGameResponse } from "../../server/src/gameServer";
 import { EmotesDefs } from "../../shared/defs/gameObjects/emoteDefs";
 import { MeleeDefs } from "../../shared/defs/gameObjects/meleeDefs";
@@ -46,7 +45,6 @@ export class Bot {
     ws: WebSocket;
 
     objectCreator = new ObjectCreator();
-    playerBarn = new PlayerBarn();
 
     constructor(id: number, res: FindGameResponse["res"][0]) {
         this.id = id;
