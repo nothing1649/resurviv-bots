@@ -24,7 +24,8 @@ interface GameObject {
     data: ObjectData<ObjectType>;
 }
 
-export class ObjectCreator {    idToObj: Record<number, GameObject> = {};
+export class ObjectCreator {
+    idToObj: Record<number, GameObject> = {};
 
     getObjById(id: number) {
         return this.idToObj[id];
