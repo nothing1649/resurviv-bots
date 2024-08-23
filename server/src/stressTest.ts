@@ -1,4 +1,5 @@
 import assert from "assert";
+import WebSocket from "ws";
 import { EmotesDefs } from "../../shared/defs/gameObjects/emoteDefs";
 import { MeleeDefs } from "../../shared/defs/gameObjects/meleeDefs";
 import { OutfitDefs } from "../../shared/defs/gameObjects/outfitDefs";
@@ -15,7 +16,7 @@ import { v2 } from "../../shared/utils/v2";
 import type { FindGameResponse } from "./gameServer";
 
 const config = {
-    address: "http://127.0.0.1:8000",
+    address: "http://127.0.0.1:8001",
     region: "local",
     gameModeIdx: 0,
     botCount: 79,
@@ -167,7 +168,7 @@ class Bot {
 
         this.emotes = [emote(), emote(), emote(), emote(), emote(), emote()];
 
-        this.ws.onmessage = (message: MessageEvent): void => {
+        this.ws.onmessage = (message: WebSocket.MessageEvent): void => {
             const stream = new net.MsgStream(message.data as ArrayBuffer);
             while (true) {
                 const type = stream.deserializeMsgType();
