@@ -1,5 +1,7 @@
 import assert from "assert";
 import WebSocket from "ws";
+import { PlayerBarn } from "../../client/src/objects/player";
+import type { FindGameResponse } from "../../server/src/gameServer";
 import { EmotesDefs } from "../../shared/defs/gameObjects/emoteDefs";
 import { MeleeDefs } from "../../shared/defs/gameObjects/meleeDefs";
 import { OutfitDefs } from "../../shared/defs/gameObjects/outfitDefs";
@@ -7,9 +9,7 @@ import { UnlockDefs } from "../../shared/defs/gameObjects/unlockDefs";
 import { GameConfig } from "../../shared/gameConfig";
 import * as net from "../../shared/net/net";
 import { util } from "../../shared/utils/util";
-import { v2 } from "../../shared/utils/v2";
-import type { FindGameResponse } from "./gameServer";
-import { ObjectCreator } from "./stressTest";
+import { ObjectCreator } from "./initialise";
 
 //
 // Cache random loadout types
@@ -34,35 +34,19 @@ for (const melee in MeleeDefs) {
 }
 
 export class Bot {
-    moving = {
-        up: false,
-        down: false,
-        left: false,
-        right: false,
-    };
-
-    shootStart = false;
-
-    interact = false;
-
     emotes: string[];
-
-    emote = false;
-
-    angle = util.random(-Math.PI, Math.PI);
-    angularSpeed = util.random(0, 0.1);
-
     toMouseLen = 50;
 
     connected = false;
-
     disconnect = false;
 
     id: number;
+    playerId!: number;
 
     ws: WebSocket;
 
     objectCreator = new ObjectCreator();
+    playerBarn = new PlayerBarn();
 
     constructor(id: number, res: FindGameResponse["res"][0]) {
         this.id = id;
@@ -105,6 +89,7 @@ export class Bot {
                 const msg = new net.JoinedMsg();
                 msg.deserialize(stream);
                 this.emotes = msg.emotes;
+                this.playerId = msg.playerId;
                 break;
             }
             case net.MsgType.Map: {
@@ -215,72 +200,8 @@ export class Bot {
 
         const inputPacket = new net.InputMsg();
 
-        inputPacket.moveDown = this.moving.down;
-        inputPacket.moveUp = this.moving.up;
-        inputPacket.moveLeft = this.moving.left;
-        inputPacket.moveRight = this.moving.right;
-
-        inputPacket.shootStart = this.shootStart;
-
-        inputPacket.toMouseDir = v2.create(Math.cos(this.angle), Math.sin(this.angle));
-        inputPacket.toMouseLen = this.toMouseLen;
-
-        this.angle += this.angularSpeed;
-        if (this.angle > Math.PI) this.angle = -Math.PI;
-
-        if (this.interact) {
-            inputPacket.addInput(GameConfig.Input.Interact);
-        }
-
         this.sendMsg(net.MsgType.Input, inputPacket);
-
-        if (this.emote) {
-            const emoteMsg = new net.EmoteMsg();
-            emoteMsg.type = this.emotes[util.randomInt(0, this.emotes.length - 1)];
-        }
     }
 
-    updateInputs(): void {
-        this.moving = {
-            up: false,
-            down: false,
-            left: false,
-            right: false,
-        };
-
-        this.shootStart = Math.random() < 0.5;
-        this.interact = Math.random() < 0.5;
-        this.emote = Math.random() < 0.5;
-
-        switch (util.randomInt(1, 8)) {
-            case 1:
-                this.moving.up = true;
-                break;
-            case 2:
-                this.moving.down = true;
-                break;
-            case 3:
-                this.moving.left = true;
-                break;
-            case 4:
-                this.moving.right = true;
-                break;
-            case 5:
-                this.moving.up = true;
-                this.moving.left = true;
-                break;
-            case 6:
-                this.moving.up = true;
-                this.moving.right = true;
-                break;
-            case 7:
-                this.moving.down = true;
-                this.moving.left = true;
-                break;
-            case 8:
-                this.moving.down = true;
-                this.moving.right = true;
-                break;
-        }
-    }
+    updateInputs(): void {}
 }

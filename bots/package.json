@@ -1,0 +1,22 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "ts-node-dev --respawn --rs --transpile-only src/initialise.ts"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "author": "goma (nothing1649)",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.8.3",
+    "@types/node": "^20.14.15",
+    "@types/ws": "^8.5.11",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.4"
+  }
+}

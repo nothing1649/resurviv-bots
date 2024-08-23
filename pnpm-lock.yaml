@@ -21,6 +21,28 @@ importers:
         specifier: ^5.5.4
         version: 5.5.4
 
+  bots:
+    dependencies:
+      ws:
+        specifier: ^8.18.0
+        version: 8.18.0
+    devDependencies:
+      '@biomejs/biome':
+        specifier: 1.8.3
+        version: 1.8.3
+      '@types/node':
+        specifier: ^20.14.15
+        version: 20.14.15
+      '@types/ws':
+        specifier: ^8.5.11
+        version: 8.5.12
+      ts-node-dev:
+        specifier: ^2.0.0
+        version: 2.0.0(@types/node@20.14.15)(typescript@5.5.4)
+      typescript:
+        specifier: ^5.5.4
+        version: 5.5.4
+
   client:
     dependencies:
       '@taufik-nurrohman/color-picker':
@@ -69,9 +91,6 @@ importers:
       uWebSockets.js:
         specifier: github:uNetworking/uWebSockets.js#v20.43.0
         version: https://codeload.github.com/uNetworking/uWebSockets.js/tar.gz/1977b5039938ad863d42fc4958d48c17e5a1fa06
-      ws:
-        specifier: ^8.18.0
-        version: 8.18.0
     devDependencies:
       '@types/nanotimer':
         specifier: ^0.3.2
@@ -79,9 +98,6 @@ importers:
       '@types/node':
         specifier: ^20.14.15
         version: 20.14.15
-      '@types/ws':
-        specifier: ^8.5.11
-        version: 8.5.12
 
   shared:
     dependencies:
