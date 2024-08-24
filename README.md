@@ -1,9 +1,6 @@
-# Open sourced surviv.io
+# Open sourced surviv.io with bot support
 Resurviv.io is an open source recreation of a hit web game "surviv.io" that has been permanently shut down.
-
-Our goal is to immortalize it by getting the recreation as close as possible to the last canonical version of the game.
-
-We do not consider any updates after the Kongregate acquisition canonical, so those will not be a part of the project.
+This is an extension of that project that intends to add bot support to the game.
 
 ### This is work in progress and not fully ready for production.
 
