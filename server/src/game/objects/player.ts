@@ -463,6 +463,7 @@ export class Player extends BaseGameObject {
     dead = false;
     downed = false;
 
+    downedCount = 0;
     bleedTicker = 0;
     playerBeingRevived: Player | undefined;
 
@@ -565,6 +566,15 @@ export class Player extends BaseGameObject {
             for (const [key, value] of Object.entries(def.defaultItems.inventory)) {
                 if (value == 0) continue; //prevents overwriting existing inventory
                 this.inventory[key] = value;
+            }
+
+            //outfit
+            const newOutfit = def.defaultItems.outfit;
+            if (newOutfit instanceof Function) {
+                this.outfit = newOutfit(this.teamId);
+            } else {
+                //string
+                if (newOutfit) this.outfit = newOutfit;
             }
 
             //armor
@@ -876,7 +886,10 @@ export class Player extends BaseGameObject {
             this.bleedTicker += dt;
             if (this.bleedTicker >= GameConfig.player.bleedTickRate) {
                 this.damage({
-                    amount: this.game.map.mapDef.gameConfig.bleedDamage,
+                    amount:
+                        this.game.map.mapDef.gameConfig.bleedDamage *
+                        (this.downedCount *
+                            this.game.map.mapDef.gameConfig.bleedDamageMult),
                     damageType: GameConfig.DamageType.Bleeding,
                     dir: this.dir,
                 });
@@ -1771,6 +1784,7 @@ export class Player extends BaseGameObject {
     /** downs a player */
     down(params: DamageParams): void {
         this.downed = true;
+        this.downedCount++;
         this.boost = 0;
         this.health = 100;
         this.animType = 0;
@@ -2791,6 +2805,29 @@ export class Player extends BaseGameObject {
                     }
                     if (gunType) {
                         this.weaponManager.setWeapon(newGunIdx, gunType, 0);
+
+                        // if "preloaded" gun add ammo to inventory
+                        if (obj.isPreloadedGun) {
+                            const ammoAmount = def.ammoSpawnCount;
+                            const ammoType = def.ammo;
+                            const backpackLevel = this.getGearLevel(this.backpack);
+                            const bagSpace = GameConfig.bagSizes[ammoType]
+                                ? GameConfig.bagSizes[ammoType][backpackLevel]
+                                : 0;
+                            if (this.inventory[ammoType] + ammoAmount <= bagSpace) {
+                                this.inventory[ammoType] += ammoAmount;
+                                this.inventoryDirty = true;
+                            } else {
+                                // spawn new loot object to animate the pickup rejection
+                                const spaceLeft = bagSpace - this.inventory[ammoType];
+                                const amountToAdd = spaceLeft;
+                                this.inventory[ammoType] += amountToAdd;
+                                this.inventoryDirty = true;
+
+                                const amountLeft = ammoAmount - amountToAdd;
+                                this.dropLoot(ammoType, amountLeft);
+                            }
+                        }
                     }
                     if (reload) {
                         this.cancelAction();
@@ -2872,17 +2909,14 @@ export class Player extends BaseGameObject {
             lootToAdd !== "" &&
             !(lootToAddDef as ChestDef).noDrop
         ) {
-            const angle = Math.atan2(this.dir.y, this.dir.x);
-            const invertedAngle = (angle + Math.PI) % (2 * Math.PI);
-            const newPos = v2.add(
-                obj.pos,
-                v2.create(0.4 * Math.cos(invertedAngle), 0.4 * Math.sin(invertedAngle)),
-            );
+            const dir = v2.neg(this.dir);
             this.game.lootBarn.addLootWithoutAmmo(
                 lootToAdd,
-                newPos,
+                v2.add(obj.pos, v2.mul(dir, 0.4)),
                 obj.layer,
                 amountLeft,
+                undefined,
+                dir,
             );
         }
 
