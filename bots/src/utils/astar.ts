@@ -4,7 +4,7 @@
 // Implements the astar search algorithm in javascript using a Binary Heap.
 // Includes Binary Heap (with modifications) from Marijn Haverbeke.
 // http://eloquentjavascript.net/appendix2.html
-type vector = {x: number, y: number}
+type vector = { x: number; y: number };
 
 function pathTo(node: GridNode) {
     let curr = node;
@@ -17,7 +17,7 @@ function pathTo(node: GridNode) {
 }
 
 function getHeap() {
-    return new BinaryHeap(function(node: GridNode) {
+    return new BinaryHeap(function (node: GridNode) {
         return node.f;
     });
 }
@@ -25,8 +25,8 @@ function getHeap() {
 type HeuristicFunc = (pos0: vector, pos1: vector) => number;
 
 type SearchParams = Partial<{
-    heuristic: HeuristicFunc,
-    closest: boolean
+    heuristic: HeuristicFunc;
+    closest: boolean;
 }>;
 
 /**
@@ -44,7 +44,7 @@ export function search(
     graph: Graph,
     start: GridNode,
     end: GridNode,
-    options?: SearchParams
+    options?: SearchParams,
 ): GridNode[] {
     graph.cleanDirty();
     const heuristic = options?.heuristic ?? heuristics.manhattan;
@@ -97,7 +97,10 @@ export function search(
                 if (closest) {
                     // If the neighbour is closer than the current closestNode or if it's equally close but has
                     // a cheaper path than the current closest node then it becomes the closest node
-                    if (neighbor.h < closestNode.h || (neighbor.h === closestNode.h && neighbor.g < closestNode.g)) {
+                    if (
+                        neighbor.h < closestNode.h ||
+                        (neighbor.h === closestNode.h && neighbor.g < closestNode.g)
+                    ) {
                         closestNode = neighbor;
                     }
                 }
@@ -123,18 +126,18 @@ export function search(
 
 // See list of heuristics: http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
 export const heuristics = {
-    manhattan: function(pos0: vector, pos1: vector): number {
+    manhattan: function (pos0: vector, pos1: vector): number {
         const d1 = Math.abs(pos1.x - pos0.x);
         const d2 = Math.abs(pos1.y - pos0.y);
         return d1 + d2;
     },
-    diagonal: function(pos0: vector, pos1: vector): number {
+    diagonal: function (pos0: vector, pos1: vector): number {
         const D2 = Math.sqrt(2);
         const d1 = Math.abs(pos1.x - pos0.x);
         const d2 = Math.abs(pos1.y - pos0.y);
-        return (d1 + d2) + ((D2 - 2) * Math.min(d1, d2));
-    }
-}
+        return d1 + d2 + (D2 - 2) * Math.min(d1, d2);
+    },
+};
 
 function cleanNode(node: GridNode) {
     node.f = 0;
@@ -245,20 +248,20 @@ export class Graph {
             const row = nodes[x];
             for (let y = 0; y < row.length; y++) {
                 switch (row[y].weight) {
-                case 0:
-                    rowDebug.push('██');
-                    break;
-                case 2:
-                    rowDebug.push('::');
-                    break;
-                case 3:
-                    rowDebug.push('[]');
-                    break;
-                case 4:
-                    rowDebug.push('()');
-                    break;
-                default:
-                    rowDebug.push('░░');
+                    case 0:
+                        rowDebug.push("██");
+                        break;
+                    case 2:
+                        rowDebug.push("::");
+                        break;
+                    case 3:
+                        rowDebug.push("[]");
+                        break;
+                    case 4:
+                        rowDebug.push("()");
+                        break;
+                    default:
+                        rowDebug.push("░░");
                 }
             }
             graphString.push(rowDebug.join(""));
@@ -266,7 +269,6 @@ export class Graph {
         return graphString.join("\n");
     }
 }
-
 
 class GridNode {
     readonly x: number;
@@ -285,9 +287,7 @@ class GridNode {
         this.weight = weight;
     }
 
-    toString(): string {
-        return "[" + this.x + " " + this.y + "]";
-    }
+    toString = (): string => `[${this.x} ${this.y}]`;
 
     getCost(fromNeighbor: GridNode): number {
         // Take diagonal weight into consideration.

@@ -9,7 +9,6 @@ import { UnlockDefs } from "../../shared/defs/gameObjects/unlockDefs";
 import { GameConfig } from "../../shared/gameConfig";
 import * as net from "../../shared/net/net";
 import { util } from "../../shared/utils/util";
-import { type Vec2 } from "../../shared/utils/v2";
 import { ObjectCreator } from "./initialise";
 
 //
