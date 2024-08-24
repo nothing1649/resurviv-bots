@@ -1,5 +1,6 @@
 import assert from "assert";
 import WebSocket from "ws";
+import type { Grid } from "../../server/src/game/grid";
 import type { FindGameResponse } from "../../server/src/gameServer";
 import { EmotesDefs } from "../../shared/defs/gameObjects/emoteDefs";
 import { MeleeDefs } from "../../shared/defs/gameObjects/meleeDefs";
@@ -8,6 +9,7 @@ import { UnlockDefs } from "../../shared/defs/gameObjects/unlockDefs";
 import { GameConfig } from "../../shared/gameConfig";
 import * as net from "../../shared/net/net";
 import { util } from "../../shared/utils/util";
+import { type Vec2 } from "../../shared/utils/v2";
 import { ObjectCreator } from "./initialise";
 
 //
@@ -33,21 +35,22 @@ for (const melee in MeleeDefs) {
 }
 
 export class Bot {
-    emotes: string[];
-    toMouseLen = 50;
+    readonly ws: WebSocket;
+    readonly stream = new net.MsgStream(new ArrayBuffer(1024));
+    readonly objectCreator = new ObjectCreator();
+    readonly grid: Grid;
 
     connected = false;
     disconnect = false;
 
-    id: number;
     playerId!: number;
+    id: number;
 
-    ws: WebSocket;
+    emotes: string[];
 
-    objectCreator = new ObjectCreator();
-
-    constructor(id: number, res: FindGameResponse["res"][0]) {
+    constructor(id: number, res: FindGameResponse["res"][0], grid: Grid) {
         this.id = id;
+        this.grid = grid;
 
         assert("gameId" in res);
         this.ws = new WebSocket(
@@ -55,18 +58,14 @@ export class Bot {
         );
 
         this.ws.addEventListener("error", console.error);
-
         this.ws.addEventListener("open", this.join.bind(this));
-
         this.ws.addEventListener("close", () => {
             this.disconnect = true;
             this.connected = false;
         });
-
         this.ws.binaryType = "arraybuffer";
 
         const emote = (): string => emotes[util.randomInt(0, emotes.length - 1)];
-
         this.emotes = [emote(), emote(), emote(), emote(), emote(), emote()];
 
         this.ws.onmessage = (message: WebSocket.MessageEvent): void => {
@@ -165,8 +164,6 @@ export class Bot {
         }
     }
 
-    stream = new net.MsgStream(new ArrayBuffer(1024));
-
     join(): void {
         this.connected = true;
 
@@ -195,11 +192,12 @@ export class Bot {
 
     sendInputs(): void {
         if (!this.connected) return;
-
         const inputPacket = new net.InputMsg();
 
         this.sendMsg(net.MsgType.Input, inputPacket);
     }
 
     updateInputs(): void {}
+
+    // computePath(target: Vec2): Vec2[] {}
 }
